@@ -1,8 +1,13 @@
 package vps
 
 import (
+	"fmt"
 	"net/http"
 	"time"
+)
+
+var (
+	ErrInvalidIP = fmt.Errorf("vps: invalid ip address")
 )
 
 var (
@@ -31,5 +36,13 @@ var (
 
 // Check returns true if an IP address is a known VPS.
 func Check(ip string) (bool, error) {
+	// First, check if the IP is even valid. Does it work for IPv4 and IPv6?
+
+	// If we haven't already, fetch the known VPS IP ranges.
+	// Store the IPs in range form: 12.34.0.0/24
+
+	// Convert the input IP into range form.
+	// Look up the range in our cache of known ranges.
+
 	return false, nil
 }
