@@ -12,6 +12,7 @@ import (
 
 var (
 	ErrInvalidIP = fmt.Errorf("vps: invalid ip address")
+	ErrNotFound  = fmt.Errorf("vps: ip address isn't associated with a known vps")
 )
 
 var (
@@ -51,85 +52,91 @@ var (
 )
 
 func refresh() error {
-	wg := sync.WaitGroup{}
+	if len(networks.subnets) == 0 || time.Now().After(lastFetched.Add(CachePeriod)) {
+		wg := sync.WaitGroup{}
 
-	for origin, sources := range Sources {
-		for url, _ := range sources {
-			wg.Add(1)
+		for origin, sources := range Sources {
+			for url, _ := range sources {
+				wg.Add(1)
 
-			go (func(url string) {
-				defer wg.Done()
+				go (func(url string) {
+					defer wg.Done()
 
-				req, err := http.NewRequest(http.MethodGet, url, nil)
+					req, err := http.NewRequest(http.MethodGet, url, nil)
 
-				if err != nil {
-					return
-				}
+					if err != nil {
+						return
+					}
 
-				req.Header.Set("User-Agent", UserAgent)
+					req.Header.Set("User-Agent", UserAgent)
 
-				res, err := HTTPClient.Do(req)
+					res, err := HTTPClient.Do(req)
 
-				if err != nil {
-					return
-				}
+					if err != nil {
+						return
+					}
 
-				if bs, err := io.ReadAll(res.Body); err == nil {
-					Sources[origin][url] = bs
-				}
-			})(url)
+					if bs, err := io.ReadAll(res.Body); err == nil {
+						Sources[origin][url] = bs
+					}
+				})(url)
+			}
 		}
-	}
 
-	wg.Wait()
+		wg.Wait()
 
-	/* merge / dedupe all domains */
+		/* merge / dedupe all domains */
 
-	subnets := map[string][]*net.IPNet{}
+		subnets := map[string][]*net.IPNet{}
 
-	for origin, sources := range Sources {
-		for _, bs := range sources {
-			for _, cidr := range bytes.Fields(bs) {
-				if _, subnet, err := net.ParseCIDR(string(cidr)); err == nil {
-					subnets[origin] = append(subnets[origin], subnet)
+		for origin, sources := range Sources {
+			for _, bs := range sources {
+				for _, cidr := range bytes.Fields(bs) {
+					if _, subnet, err := net.ParseCIDR(string(cidr)); err == nil {
+						subnets[origin] = append(subnets[origin], subnet)
+					}
 				}
 			}
 		}
-	}
 
-	/* clear Soures byte cache */
+		/* clear Soures byte cache */
 
-	for origin, sources := range Sources {
-		for url, _ := range sources {
-			Sources[origin][url] = []byte{}
+		for origin, sources := range Sources {
+			for url, _ := range sources {
+				Sources[origin][url] = []byte{}
+			}
 		}
+
+		/* update global networks cache */
+
+		networks.Lock()
+
+		networks.subnets = subnets
+		lastFetched = time.Now()
+
+		networks.Unlock()
 	}
-
-	/* update global networks cache */
-
-	networks.Lock()
-
-	networks.subnets = subnets
-	lastFetched = time.Now()
-
-	networks.Unlock()
 
 	return nil
 }
 
-// Check returns true if an IP address is a known VPS.
-func Check(ipstr string) (bool, error) {
+// Check returns the VPS associated with the IP, or an error.
+func Check(ipstr string) (string, error) {
 	ip := net.ParseIP(ipstr)
 
 	if ip == nil {
-		return false, ErrInvalidIP
+		return "", ErrInvalidIP
 	}
 
-	// If we haven't already, fetch the known VPS IP ranges.
-	// Store the IPs in range form: 12.34.0.0/24
+	refresh()
 
-	// Convert the input IP into range form.
-	// Look up the range in our cache of known ranges.
+	for origin, subnets := range networks.subnets {
+		for _, subnet := range subnets {
+			if subnet.Contains(ip) {
+				return origin, nil
+			}
+		}
+	}
 
-	return false, nil
+	return "", ErrNotFound
 }

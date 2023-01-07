@@ -25,7 +25,7 @@ func TestCheckWithInvalidIPs(t *testing.T) {
 }
 
 func Test(t *testing.T) {
-	if ok, err := Check("12.34.56.78"); err != nil || !ok {
+	if result, err := Check("12.34.56.78"); err != nil || result != "fake-vps" {
 		t.Fatalf("failed to identify a known vps; 12.34.56.78")
 	}
 }
