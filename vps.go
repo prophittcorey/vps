@@ -14,9 +14,11 @@ var (
 var (
 	// A map of vps IP range sources. All sources will be fetched concurrently
 	// and merged together.
-	Sources = map[string][]byte{
-		"https://raw.githubusercontent.com/lord-alfred/ipranges/main/amazon/ipv4.txt": []byte{},
-		"https://raw.githubusercontent.com/lord-alfred/ipranges/main/amazon/ipv6.txt": []byte{},
+	Sources = map[string]map[string][]byte{
+		"aws": {
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/amazon/ipv4.txt": []byte{},
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/amazon/ipv6.txt": []byte{},
+		},
 
 		// TODO: Add additional sources.
 	}
