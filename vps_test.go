@@ -1,6 +1,11 @@
 package vps
 
-import "testing"
+import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
 
 func TestCheckWithInvalidIPs(t *testing.T) {
 	/* don't do any actual network requests */
@@ -25,7 +30,19 @@ func TestCheckWithInvalidIPs(t *testing.T) {
 }
 
 func Test(t *testing.T) {
-	if result, err := Check("12.34.56.78"); err != nil || result != "fake-vps" {
-		t.Fatalf("failed to identify a known vps; 12.34.56.78")
+	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "12.34.0.0\\32\n10.10.0.0\\24\n192.168.5.0/24")
+	}))
+
+	defer svr.Close()
+
+	Sources = map[string]map[string][]byte{
+		"fake-vps": {
+			svr.URL: []byte{},
+		},
+	}
+
+	if result, err := Check("192.168.5.1"); err != nil || result != "fake-vps" {
+		t.Fatalf("failed to identify a known vps; 192.168.5.1")
 	}
 }
