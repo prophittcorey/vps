@@ -15,8 +15,12 @@ func main() {
 	flag.Parse()
 
 	if len(ip) > 0 {
-		if val, err := vps.Check(ip); err == nil {
-			fmt.Println(val)
+		vpsname, err := vps.Check(ip)
+
+		if err == nil {
+			fmt.Printf("Looks like a '%s' address.\n", vpsname)
+		} else {
+			fmt.Printf("Does not look like a vps address.\n")
 		}
 
 		return
