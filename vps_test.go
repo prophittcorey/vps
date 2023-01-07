@@ -3,6 +3,10 @@ package vps
 import "testing"
 
 func TestCheckWithInvalidIPs(t *testing.T) {
+	/* don't do any actual network requests */
+
+	Sources = map[string]map[string][]byte{}
+
 	/* check invalid IPs */
 
 	if _, err := Check("---"); err != ErrInvalidIP {
