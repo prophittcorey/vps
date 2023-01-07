@@ -1,9 +1,12 @@
 package vps
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -36,6 +39,83 @@ var (
 	// UserAgent will be used in each request's user agent header field.
 	UserAgent = "github.com/prophittcorey/vps"
 )
+
+type vpses struct {
+	sync.RWMutex
+	subnets map[string][]*net.IPNet /* origin -> [*IPNet], ex: 'aws' => [...] */
+}
+
+var (
+	networks    = vpses{}
+	lastFetched = time.Now()
+)
+
+func refresh() error {
+	wg := sync.WaitGroup{}
+
+	for origin, sources := range Sources {
+		for url, _ := range sources {
+			wg.Add(1)
+
+			go (func(url string) {
+				defer wg.Done()
+
+				req, err := http.NewRequest(http.MethodGet, url, nil)
+
+				if err != nil {
+					return
+				}
+
+				req.Header.Set("User-Agent", UserAgent)
+
+				res, err := HTTPClient.Do(req)
+
+				if err != nil {
+					return
+				}
+
+				if bs, err := io.ReadAll(res.Body); err == nil {
+					Sources[origin][url] = bs
+				}
+			})(url)
+		}
+	}
+
+	wg.Wait()
+
+	/* merge / dedupe all domains */
+
+	subnets := map[string][]*net.IPNet{}
+
+	for origin, sources := range Sources {
+		for _, bs := range sources {
+			for _, cidr := range bytes.Fields(bs) {
+				if _, subnet, err := net.ParseCIDR(string(cidr)); err == nil {
+					subnets[origin] = append(subnets[origin], subnet)
+				}
+			}
+		}
+	}
+
+	/* clear Soures byte cache */
+
+	for origin, sources := range Sources {
+		for url, _ := range sources {
+			Sources[origin][url] = []byte{}
+		}
+	}
+
+	/* update global networks cache */
+
+	networks.Lock()
+
+	networks.subnets = subnets
+	lastFetched = time.Now()
+
+	networks.Unlock()
+
+	return nil
+}
 
 // Check returns true if an IP address is a known VPS.
 func Check(ipstr string) (bool, error) {
