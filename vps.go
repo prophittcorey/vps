@@ -2,6 +2,7 @@ package vps
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 )
@@ -35,8 +36,12 @@ var (
 )
 
 // Check returns true if an IP address is a known VPS.
-func Check(ip string) (bool, error) {
-	// First, check if the IP is even valid. Does it work for IPv4 and IPv6?
+func Check(ipstr string) (bool, error) {
+	ip := net.ParseIP(ipstr)
+
+	if ip == nil {
+		return false, ErrInvalidIP
+	}
 
 	// If we haven't already, fetch the known VPS IP ranges.
 	// Store the IPs in range form: 12.34.0.0/24
