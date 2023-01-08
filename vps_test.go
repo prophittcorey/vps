@@ -30,8 +30,14 @@ func TestCheckWithInvalidIPs(t *testing.T) {
 }
 
 func TestCheck(t *testing.T) {
+	svr2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "12.34.0.0/24\n10.10.0.0/24")
+	}))
+
+	defer svr2.Close()
+
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "12.34.0.0/24\n10.10.0.0/24\n192.168.5.0/24")
+		fmt.Fprintf(w, "45.67.0.0/24\n192.168.5.0/24")
 	}))
 
 	defer svr.Close()
@@ -39,6 +45,9 @@ func TestCheck(t *testing.T) {
 	Sources = map[string]map[string][]byte{
 		"fake-vps": {
 			svr.URL: []byte{},
+		},
+		"fake-vps-2": {
+			svr2.URL: []byte{},
 		},
 	}
 
