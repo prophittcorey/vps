@@ -1,5 +1,7 @@
 # VPS
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/prophittcorey/vps.svg)](https://pkg.go.dev/github.com/prophittcorey/vps)
+
 A golang package and command line tool for the identification of VPS IP
 addresses.
 
