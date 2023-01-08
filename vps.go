@@ -162,3 +162,19 @@ func Check(ipstr string) (string, error) {
 
 	return "", ErrNotFound
 }
+
+// Subnets will return all known VPS subnets.
+func Subnets() []*net.IPNet {
+	refresh()
+
+	ss := []*net.IPNet{}
+
+	for _, subnets := range networks.subnets {
+		for _, subnet := range subnets {
+			subnet := subnet
+			ss = append(ss, subnet)
+		}
+	}
+
+	return ss
+}
