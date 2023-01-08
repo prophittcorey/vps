@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"sync"
@@ -81,6 +82,9 @@ func refresh() error {
 		wg := sync.WaitGroup{}
 
 		for origin, sources := range Sources {
+			origin := origin
+			sources := sources
+
 			for url, _ := range sources {
 				wg.Add(1)
 
@@ -115,9 +119,15 @@ func refresh() error {
 		subnets := map[string][]*net.IPNet{}
 
 		for origin, sources := range Sources {
+			origin := origin
+			sources := sources
+
 			for _, bs := range sources {
 				for _, cidr := range bytes.Fields(bs) {
 					if _, subnet, err := net.ParseCIDR(string(cidr)); err == nil {
+						if subnet.String() == "45.79.99.0/24" {
+							log.Println(origin)
+						}
 						subnets[origin] = append(subnets[origin], subnet)
 					}
 				}
@@ -156,6 +166,9 @@ func Check(ipstr string) (string, error) {
 	refresh()
 
 	for origin, subnets := range networks.subnets {
+		origin := origin
+		subnets := subnets
+
 		for _, subnet := range subnets {
 			if subnet.Contains(ip) {
 				return origin, nil
@@ -174,7 +187,6 @@ func Subnets() []*net.IPNet {
 
 	for _, subnets := range networks.subnets {
 		for _, subnet := range subnets {
-			subnet := subnet
 			ss = append(ss, subnet)
 		}
 	}
