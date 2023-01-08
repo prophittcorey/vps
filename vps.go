@@ -46,7 +46,7 @@ var (
 			"https://raw.githubusercontent.com/Pymmdrza/Datacenter_List_DataBase_IP/mainx/Hetzner/CIDR.txt": []byte{},
 		},
 
-		// TODO: Add additional sources.
+		// TODO: Add additional sources (and/or backup sources if one or more fail).
 	}
 
 	// HTTPClient is used to perform all HTTP requests. You can specify your own
@@ -55,13 +55,16 @@ var (
 		Timeout: 3 * time.Second,
 	}
 
-	// CachePeriod specifies the amount of time an internal cache of disposable email domains are used
-	// before refreshing the domains.
+	// CachePeriod specifies the amount of time an internal cache of vps subnets are used
+	// before refreshing the subnets.
 	CachePeriod = 45 * time.Minute
 
 	// UserAgent will be used in each request's user agent header field.
 	UserAgent = "github.com/prophittcorey/vps"
 )
+
+// TODO: Is there a more efficient data structure for IP -> Subnet look ups? Currently it's
+// O(n), but there is likely a O(1) solution out there.
 
 type vpses struct {
 	sync.RWMutex
@@ -121,7 +124,7 @@ func refresh() error {
 			}
 		}
 
-		/* clear Soures byte cache */
+		/* clear byte cache of sources */
 
 		for origin, sources := range Sources {
 			for url, _ := range sources {
