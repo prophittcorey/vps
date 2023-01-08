@@ -23,6 +23,28 @@ var (
 			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/amazon/ipv4.txt": []byte{},
 			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/amazon/ipv6.txt": []byte{},
 		},
+		"linode": {
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/linode/ipv4.txt": []byte{},
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/linode/ipv6.txt": []byte{},
+		},
+		"digitalocean": {
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/digitalocean/ipv4.txt": []byte{},
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/digitalocean/ipv6.txt": []byte{},
+		},
+		"azure": {
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/microsoft/ipv4.txt": []byte{},
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/microsoft/ipv6.txt": []byte{},
+		},
+		"googlecloud": {
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/google/ipv4.txt": []byte{},
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/google/ipv6.txt": []byte{},
+		},
+		"oracle": {
+			"https://raw.githubusercontent.com/lord-alfred/ipranges/main/oracle/ipv4.txt": []byte{},
+		},
+		"hetzner": {
+			"https://raw.githubusercontent.com/Pymmdrza/Datacenter_List_DataBase_IP/mainx/Hetzner/CIDR.txt": []byte{},
+		},
 
 		// TODO: Add additional sources.
 	}

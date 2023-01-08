@@ -29,9 +29,9 @@ func TestCheckWithInvalidIPs(t *testing.T) {
 	}
 }
 
-func Test(t *testing.T) {
+func TestCheck(t *testing.T) {
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "12.34.0.0\\32\n10.10.0.0\\24\n192.168.5.0/24")
+		fmt.Fprintf(w, "12.34.0.0/24\n10.10.0.0/24\n192.168.5.0/24")
 	}))
 
 	defer svr.Close()
