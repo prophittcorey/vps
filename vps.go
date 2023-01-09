@@ -1,3 +1,5 @@
+// Package vps enables you to analyze an IP address and determine if the
+// origin is a known VPS provider such as Linode, AWS, etc.
 package vps
 
 import (
