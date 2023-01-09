@@ -21,13 +21,13 @@ vps.Subnets() // => [*IPNet, ...]
 
 ```bash
 # Install the latest tool.
-$ go install github.com/prophittcorey/vps/cmd/vps@latest
+go install github.com/prophittcorey/vps/cmd/vps@latest
 
 # Dump all known VPS provider subnets.
-$ vps --subnets
+vps --subnets
 
 # Check a specific IP address.
-$ vps --check 12.34.56.78
+vps --check 12.34.56.78
 ```
 
 ## License
