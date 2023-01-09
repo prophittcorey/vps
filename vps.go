@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"sync"
@@ -125,9 +124,6 @@ func refresh() error {
 			for _, bs := range sources {
 				for _, cidr := range bytes.Fields(bs) {
 					if _, subnet, err := net.ParseCIDR(string(cidr)); err == nil {
-						if subnet.String() == "45.79.99.0/24" {
-							log.Println(origin)
-						}
 						subnets[origin] = append(subnets[origin], subnet)
 					}
 				}
