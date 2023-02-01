@@ -47,6 +47,15 @@ var (
 		"hetzner": {
 			"https://raw.githubusercontent.com/Pymmdrza/Datacenter_List_DataBase_IP/mainx/Hetzner/CIDR.txt": []byte{},
 		},
+		"ovh": {
+			"https://gist.githubusercontent.com/prophittcorey/2fc921fe3de9a61469b8a14b8f22fc77/raw/ovh.txt": []byte{},
+		},
+		"vultr+choopa": {
+			"https://gist.githubusercontent.com/prophittcorey/da876ac8e2026c332c1195398756be82/raw/vultr+choopa.txt": []byte{},
+		},
+		"hostroyale": {
+			"https://gist.githubusercontent.com/prophittcorey/f831d413a73ae0cb6f9c8eadd2c0fe42/raw/hostroyale.txt": []byte{},
+		},
 
 		// TODO: Add additional sources (and/or backup sources if one or more fail).
 	}
